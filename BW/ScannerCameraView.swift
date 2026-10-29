@@ -115,7 +115,7 @@ final class ScannerViewController: UIViewController,
         session.addOutput(output)
         output.setMetadataObjectsDelegate(self, queue: .main)
         output.metadataObjectTypes = [
-            .ean8, .ean13, .upce, .code39, .code93, .code128,
+            .ean8, .ean13, .upce, .code39, .code93, .code128
         ]
         let layer = AVCaptureVideoPreviewLayer(session: session)
         layer.videoGravity = .resizeAspectFill

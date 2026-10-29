@@ -40,9 +40,7 @@ final class ScannerViewModel {
             scannedItem = try await lookup.lookup(barcode: code)
         } catch let error as LookupError {
             switch error {
-            case .httpStatus:
-                fallthrough
-            case .decoding, .noData:
+            case .httpStatus, .decoding, .noData:
                 // The provider has no record for this barcode.
                 // Hand the user a placeholder to complete by hand
                 // instead of a dead end.

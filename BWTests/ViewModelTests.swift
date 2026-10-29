@@ -84,7 +84,7 @@ struct ViewModelTests {
                 code: "222",
                 company: "Beta Co",
                 description: "Beta Widget"
-            ),
+            )
         ])
         let viewModel = ItemListViewModel(
             store: store,
