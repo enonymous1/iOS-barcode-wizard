@@ -1,5 +1,4 @@
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 import Foundation
 
 /// Persistence for scanned items, behind a protocol so the list
@@ -17,7 +16,9 @@ protocol ItemStore: Sendable {
 }
 
 /// Cloud Firestore, using the Codable support in
-/// FirebaseFirestoreSwift. The document ID is the barcode, so
+/// FirebaseFirestore (the separate FirebaseFirestoreSwift product
+/// was merged into it in Firebase 11 and does not exist in the
+/// 12.x SDK). The document ID is the barcode, so
 /// saving the same item twice overwrites it instead of creating
 /// a duplicate row.
 final class FirebaseItemStore: ItemStore, @unchecked Sendable {
