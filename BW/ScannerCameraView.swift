@@ -46,6 +46,7 @@ final class ScannerViewController: UIViewController {
 
     private var captureSession: AVCaptureSession?
     private var previewLayer: AVCaptureVideoPreviewLayer?
+    private let metadataDelegate = ScannerMetadataDelegate()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,7 +113,8 @@ final class ScannerViewController: UIViewController {
         let output = AVCaptureMetadataOutput()
         guard session.canAddOutput(output) else { return }
         session.addOutput(output)
-        output.setMetadataObjectsDelegate(self, queue: .main)
+        metadataDelegate.onCode = onCode
+        output.setMetadataObjectsDelegate(metadataDelegate, queue: .main)
         output.metadataObjectTypes = [
             .ean8, .ean13, .upce, .code39, .code93, .code128
         ]
@@ -127,14 +129,22 @@ final class ScannerViewController: UIViewController {
 
 }
 
-/// The delegate is called on the main queue (see `startSession`,
-/// `setMetadataObjectsDelegate(self, queue: .main)`), so isolating
-/// the conformance to the main actor is correct — and it is what
-/// Swift 6 requires: the protocol requirement is nonisolated,
-/// while this view controller's methods are main-actor-isolated,
-/// so a plain conformance on the class does not compile.
-@MainActor
-extension ScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
+/// The capture-output delegate, kept separate from the view
+/// controller on purpose. `AVCaptureMetadataOutputObjectsDelegate`
+/// is a nonisolated ObjC protocol, while the view controller's
+/// methods are main-actor-isolated, so conforming the controller
+/// itself does not compile under Swift 6. This class is not
+/// main-actor-isolated, so its method satisfies the protocol
+/// requirement directly. It is still called on the main queue
+/// (`setMetadataObjectsDelegate(_:queue: .main)` in
+/// `startSession`), and the codes it forwards are handled on the
+/// main actor by the caller's `Task` in `ScannerView`. The
+/// controller retains this delegate; the capture output holds
+/// it weakly.
+final class ScannerMetadataDelegate: NSObject,
+    AVCaptureMetadataOutputObjectsDelegate {
+    var onCode: ((String) -> Void)?
+
     func metadataOutput(
         _ output: AVCaptureMetadataOutput,
         didOutput metadataObjects: [AVMetadataObject],
