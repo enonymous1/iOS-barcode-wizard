@@ -40,8 +40,7 @@ struct ScannerCameraView: UIViewControllerRepresentable {
     }
 }
 
-final class ScannerViewController: UIViewController,
-    AVCaptureMetadataOutputObjectsDelegate {
+final class ScannerViewController: UIViewController {
     var onCode: ((String) -> Void)?
     var onPermissionDenied: (() -> Void)?
 
@@ -126,6 +125,16 @@ final class ScannerViewController: UIViewController,
         session.startRunning()
     }
 
+}
+
+/// The delegate is called on the main queue (see `startSession`,
+/// `setMetadataObjectsDelegate(self, queue: .main)`), so isolating
+/// the conformance to the main actor is correct — and it is what
+/// Swift 6 requires: the protocol requirement is nonisolated,
+/// while this view controller's methods are main-actor-isolated,
+/// so a plain conformance on the class does not compile.
+@MainActor
+extension ScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
     func metadataOutput(
         _ output: AVCaptureMetadataOutput,
         didOutput metadataObjects: [AVMetadataObject],
