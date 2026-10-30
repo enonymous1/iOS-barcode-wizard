@@ -25,9 +25,9 @@ struct ScanDeduplicatorTests {
         let repeatAfter1s = gate.shouldAccept(
             "012345678905", at: now.addingTimeInterval(1))
         #expect(!repeatAfter1s)
-        let repeatAfter1_9s = gate.shouldAccept(
+        let repeatAfter1Point9s = gate.shouldAccept(
             "012345678905", at: now.addingTimeInterval(1.9))
-        #expect(!repeatAfter1_9s)
+        #expect(!repeatAfter1Point9s)
     }
 
     @Test("A different code is always accepted immediately")
